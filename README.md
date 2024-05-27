@@ -1,70 +1,207 @@
-# Getting Started with Create React App
+```js
+// ternary operator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+function App() {
+  let age = 19 
+  let isGreen = true
+  return (
+    <div className="App">
+     {age <25? "underage":"overage"}
+     <h1 className={`${isGreen?"text-green-500":"text-red-500"}`} >This has color</h1>
+     {
+      isGreen && <button>hey it's green</button>
+     }
+    </div>
+  );
+}
 
-## Available Scripts
+export default App;
 
-In the project directory, you can run:
+```
+```js
 
-### `npm start`
+//mapping
+function App() {
+  let users=["sharath","alvin","affan","lijo"]
+  return (
+    <div>
+    {
+      users.map((item)=>{
+        return(
+          <div>
+            <h1>{item}</h1>
+          </div>
+        )
+      }
+    )
+    }
+    </div>
+  );
+}
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+export default App;
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+```js
+function App() {
+  let users=[
+    {name:"sharath",age:19},
+    {name:"alvin",age:20},
+    {name:"shon",age:21},
+  ]
+  return (
+  <div>
+    {users.map((item, index) => {
+      return (
+        <div key={index}>
+        <h1>{item.name}</h1>
+        <h1>{item.age}</h1>
+          
+        </div>
+      )
+    })}
+  </div>
+   
+  );
+}
 
-### `npm test`
+export default App;
+```
+```js
+//destructring (components,userdetails.jsx)
+import React from 'react'
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+const UserDetails = ({name,age}) => {
+  return (
+    <div>
+      <div>
+        <h1>{name}</h1>
+        <h1>{age}</h1>
+          
+        </div>
+    </div>
+  )
+}
 
-### `npm run build`
+export default UserDetails
+```
+```js
+import React from 'react'
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+const UserDetails = ({name,age}) => {
+  return (
+    <div>
+      <div>
+        <h1>{name}</h1>
+        <h1>{age}</h1>
+          
+        </div>
+    </div>
+  )
+}
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+export default UserDetails
+```
+```js
+//some of reacts hoopks
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+/*
+components : a component is an independent reusable peace of code they return HTML .There are class components and functional components
+props :It is special keyword in react that stand for property it is used for passing data from one component to another data with props are passed inner unidirectional flow from parent to child
 
-### `npm run eject`
+*/
+```
+```js
+import { useEffect, useState } from "react";
+import ToDo from "./components/ToDo";
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+const localData = () => {
+  let list = localStorage.getItem("data")
+  if(list) {
+    return JSON.parse(list)
+  }else{
+    return []
+  }
+}
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+function App() {
+  const [todoList,setToDoList] = useState(localData())
+  const [newTask, setNewTask] = useState("")
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+// add task
+  const addTask = (e) => {
+    e.preventDefault()
+    let task = {
+      id: todoList.length === 0 ? 1 : todoList[todoList.length-1].id + 1,
+      taskName:newTask,
+      completed:false
+    }
+  let newToDoList=[...todoList,task]
+  setToDoList(newToDoList)
+  setNewTask("")
+  }
+  //useeffect
+  useEffect(() => {
+    localStorage.setItem("data", JSON.stringify(todoList))
+  },[todoList])
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+   
+  //delete task
+const deleteTask = (id) => {
+  let newTodoList = todoList.filter((item) => {
+   return item.id !== id
+  })
+  setToDoList(newTodoList)
+}
+  //completed 
+  const isCompleted =(id) =>{
+     setToDoList(todoList.map((item) =>{
+      if(item.id === id){
+        return{...item,completed:true}
+      }else{
+        return item
+      }
+     }))
+  }
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+  //update task
+  const updateTask =(id)=>{
+let  changeTask=todoList.find((item) =>{
+return item.id === id
+})
 
-### Analyzing the Bundle Size
+let newToDoList=todoList.filter((item)=>{
+return item.id !== id
+})
+setNewTask(changeTask.taskName)
+setToDoList(newToDoList)
+  }
+  return (
+  <div className="bg-black text-white w-full min-h-screen ">
+ <form className="flex justify-center pt-36 gap-10">
+  <input value={newTask} onChange={(e) => setNewTask(e.target.value)} type="text" className="w-[400px] px-6 py-2  rounded-md bg-gray-700 border-none outline-none"/>
+  <button onClick={addTask} className="bg-pink-500 px-6 py-2 rounded-md border-none outline-none">Add Task</button>
+ </form>
+ 
+ <div className="text-center pt-10">
+  {
+    todoList && todoList.map((item,index)=>{
+      return(
+        <ToDo key={item.id} deleteTask={deleteTask} updateTask={updateTask} index={index} taskName={item.taskName} id={item.id} isCompleted={isCompleted} completed={item.completed}/>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+      )
+    })
+  }
+ </div>
+  </div>
+   
+  );
+}
 
-### Making a Progressive Web App
+export default App;
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
